@@ -1,0 +1,10 @@
+Package: causalA16
+Type: Package
+Title: Simple simulation about potential outcomes and causal estimation
+Version: 0.1.0
+Author: Jianzi He (Instructed by William Minozzi)
+Maintainer: Who to complain to <yourfault@somewhere.net>
+Description: More about what it does (maybe more than one line)
+License: What license is it under?
+LazyData: TRUE
+RoxygenNote: 5.0.1
