@@ -3,6 +3,7 @@
 export(calc_average_causal_effect_estimand)
 export(calc_conditional_difference_in_means)
 export(calc_naive_difference_in_means)
+export(load_dataset)
 export(make_data_for_figure_4_1)
 export(simulate_observational_data)
 export(simulate_potential_outcomes)
