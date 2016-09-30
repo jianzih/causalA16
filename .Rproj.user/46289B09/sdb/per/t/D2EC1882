@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "# Explorative data analysis\n\nlibrary(causalA16)\nlibrary(data.table)\nlibrary(ggplot2)\nlibrary(texreg)\nlibrary(plm)\n\ndata1 <- load_dataset(\"Ross_full\")\ndata2 <- load_dataset(\"Ross_5_year\")\n\n# selective decriptive statistics\nattach(data2)\nx <- data.frame(logCMRunicef,logIMRunicef,Polity_1,logDEMYRS_1,logGDPcap_1,logDen_1,GDPgrowth_1,logHIV_1)\ndesc.1 <- describe(x)\n\n\nlibrary(xtable)\nxtable(desc.1,skew=F)\n\nmt <- plm(logCMRunicef ~ Polity_1 + logHIV_1 + logGDPcap_1 + logDen_1 + GDPgrowth_1, data=data2, index=c(\"id\", \"period\"), model=\"within\", effect = \"twoways\")\nsummary(mt)\n\n\n## Simple regression estimate\n\nm1 <- lm(logCMRunicef ~ Polity_1 + logHIV_1 + logGDPcap_1 + logDen_1 + GDPgrowth_1, data=data2)\nm2 <- lm(logCMRunicef ~ logHIV_1 + logGDPcap_1 + logDen_1 + GDPgrowth_1 + logDEMYRS_1, data=data2)\nm3 <- lm(logCMRunicef ~ logGDPcap_1 + logDen_1 + GDPgrowth_1 + logDEMYRS_1, data=data2)\nm4 <- lm(logIMRunicef ~ Polity_1 + logHIV_1 + logGDPcap_1 + logDen_1 + GDPgrowth_1, data=data2)\nm5 <- lm(logIMRunicef ~ logHIV_1 + logGDPcap_1 + logDen_1 + GDPgrowth_1 + logDEMYRS_1, data=data2)\nm6 <- lm(logIMRunicef ~ logGDPcap_1 + logDen_1 + GDPgrowth_1 + logDEMYRS_1, data=data2)\n\ntexreg(list(m1, m2, m3, m4, m5, m6))\n\n##  Estimate with matching\n\nlibrary(Matching)\n\n# drop missing data\ndata3 <- na.omit(data2)\n\n# create a dummy as the treatment based on Polity_1\ndata3$treatment1[data3$Polity_1<=0] <- 0\ndata3$treatment1[data3$Polity_1>0] <- 1\n\n# calculate the propensity score\nps <- glm(treatment1 ~ logHIV_1 + logGDPcap_1 + logDen_1 + GDPgrowth_1, data=data3, family = binomial)\n\nps1 <- predict(ps, data3, type = \"response\")\n\nma1 <- Match(data3$logCMRunicef, data3$treatment1,ps1)\nma2 <- Match(data3$logIMRunicef, data3$treatment1, ps1)\n\n\n# create a dummy as the treatment based on logDemYRS_1 and replicate Matching\ndata3$treatment2[data3$logDEMYRS_1<=0] <- 0\ndata3$treatment2[data3$logDEMYRS_1>0] <- 1\n\nps <- glm(treatment2 ~ logHIV_1 + logGDPcap_1 + logDen_1 + GDPgrowth_1, data=data3, family = binomial)\n\nps2 <- predict(ps, data3, type = \"response\")\n\nma3 <- Match(data3$logCMRunicef, data3$treatment2,ps2)\nma4 <- Match(data3$logIMRunicef, data3$treatment2,ps2)\n\nmatchtable <- matrix(c(ma1$est, ma2$est, ma3$est, ma4$est, ma1$se, ma2$se, ma3$se, ma4$se, ma1$wnobs, ma2$wnobs, ma3$wnobs, ma4$wnobs), ncol = 3)\ncolnames(matchtable) <- c(\"Estimate\", \"SE\", \"Num. obs.\")\nxtable(matchtable)\n\n\n\n# check balance\nhist(data3$treatment1)\nhist(data3$treatment2)\n\n\n\n\n\n\n\n",
+    "created" : 1475000337692.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "104681396",
+    "id" : "D2EC1882",
+    "lastKnownWriteTime" : 1475268312,
+    "last_content_update" : 1475268312035,
+    "path" : "~/R/workspace/causalA16/dev/eda.R",
+    "project_path" : "dev/eda.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
